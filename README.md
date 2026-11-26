@@ -67,7 +67,7 @@ Seluruh grafik hasil analisis diekspor dalam resolusi tinggi ke dalam folder [`O
 
 | Distribusi Kelas Sentimen | WordCloud Opini Kebijakan Fiskal |
 | :---: | :---: |
-| ![Distribusi Sentimen](Output/01 Tabel jumlah dan persentase missing.jpg) | ![WordCloud Fiskal](Output/02_wordcloud.jpg) |
+| ![Distribusi Sentimen](Output/01 Tabel jumlah dan persentase missing.jpg) | ![WordCloud Fiskal]([Output/02_wordcloud.jpg](https://github.com/haninurul792/DataScience/commit/12294dd726f77686e81aeabda96e3560efed5e25)) |
 
 | Distribusi Panjang Teks & Token | Deteksi Outlier Panjang Teks (IQR Series) |
 | :---: | :---: |
