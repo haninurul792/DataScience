@@ -31,7 +31,7 @@ Repositori ini mendokumentasikan alur *end-to-end* mulai dari **pengumpulan data
 | **Domain & Objek** | Opini publik media sosial X terhadap kebijakan fiskal nasional |
 | **Tahap 1 — Akuisisi Data** | Web Scraping cuitan media sosial X ([`Scraping EDA.ipynb`](Scraping%20EDA.ipynb)) |
 | **Sumber Dataset** | [`DataTwitter_Purbaya_Fiskal.xlsx`](DataTwitter_Purbaya_Fiskal.xlsx) |
-| **Tahap 2 — EDA & Pemodelan** | Pembersihan teks, deteksi outlier (IQR), WordCloud, & Fine-Tuning **IndoBERT** ([`EDA_Sentimen_Kebijakan_Fiskal_X_IndoBERT_Lengkap.ipynb`](EDA_Sentimen_Kebijakan_Fiskal_X_IndoBERT_Lengkap.ipynb)) |
+| **Tahap 2 — EDA & Pemodelan** | Pembersihan teks, analisis distribusi, korelasi Spearman, deteksi outlier (IQR), & Fine-Tuning **IndoBERT** ([`EDA_Sentimen_Kebijakan_Fiskal_X_IndoBERT_Lengkap.ipynb`](EDA_Sentimen_Kebijakan_Fiskal_X_IndoBERT_Lengkap.ipynb)) |
 | **Ekosistem Pustaka** | `pandas`, `openpyxl`, `numpy`, `matplotlib`, `seaborn`, `wordcloud`, `scikit-learn`, `torch`, `transformers` |
 
 ---
@@ -39,7 +39,7 @@ Repositori ini mendokumentasikan alur *end-to-end* mulai dari **pengumpulan data
 ## Latar Belakang dan Tujuan
 
 1. **Akuisisi Data Opini Publik Terarah (*Targeted Scraping*):** Mengumpulkan korpus cuitan berbahasa Indonesia yang relevan dengan wacana kebijakan fiskal dan perpajakan di media sosial X sebagai fondasi empiris penelitian.
-2. **Pemetaan Kualitas & Struktur Data Teks (EDA):** Mengidentifikasi pola distribusi kelas sentimen, frekuensi kata dominan, serta anomali panjang teks sebelum memasuki tahap pemodelan *deep learning*.
+2. **Pemetaan Kualitas & Struktur Data Teks (EDA):** Mengidentifikasi nilai hilang (*missing values*), kemiringan distribusi (*skewness & kurtosis*), korelasi antarvariabel (*Spearman*), serta anomali panjang teks (*outlier IQR*) sebelum memasuki tahap pemodelan *deep learning*.
 3. **Klasifikasi Sentimen Kontekstual dengan IndoBERT:** Memanfaatkan mekanisme *self-attention* dua arah (*bidirectional*) dan tokenisasi sub-kata (*WordPiece*) pada **IndoBERT** untuk menangkap istilah teknis ekonomi/fiskal serta struktur kalimat tidak baku di media sosial.
 
 ---
@@ -51,27 +51,31 @@ Seluruh proses pengumpulan data, inspeksi statistik, pembersihan teks, dan pelat
 | Dimensi Analisis | Temuan & Metode | Implikasi Pemodelan |
 | :--- | :--- | :--- |
 | **Akuisisi & Korpus Data** | Pengumpulan cuitan melalui [`Scraping EDA.ipynb`](Scraping%20EDA.ipynb) dan penyimpanan terstruktur ke [`DataTwitter_Purbaya_Fiskal.xlsx`](DataTwitter_Purbaya_Fiskal.xlsx). | Menyediakan dataset domain-spesifik kebijakan fiskal berbahasa Indonesia. |
-| **Integritas & Kebersihan Data** | Penghapusan baris duplikat, *retweet* identik, tautan URL (`http/https`), *mention* (`@user`), dan karakter non-alfanumerik. | Mencegah kebocoran data (*data leakage*) dan mengurangi *noise* pada bobot token. |
-| **Deteksi Outlier Panjang Teks** | Analisis *Interquartile Range* (**IQR**) pada distribusi panjang karakter dan jumlah kata per cuitan. | Menjadi dasar empiris penentuan batas panjang urutan (*`max_length`*) pada tokenizer IndoBERT agar efisien di GPU. |
-| **Eksplorasi Leksikal & Topik** | Visualisasi *WordCloud* dan distribusi frekuensi kata kunci utama seputar kebijakan fiskal dan perpajakan. | Mengonfirmasi relevansi korpus terhadap isu ekonomi makro dan respons publik. |
-| **Representasi Sub-Kata** | Tokenisasi *WordPiece* dengan penyisipan token khusus `[CLS]`, `[SEP]`, dan `[PAD]`. | Mampu memecah kata berimbuhan kompleks dan istilah baru tanpa memicu masalah *Out-of-Vocabulary* (OOV). |
+| **Pemeriksaan Missing Values** | Audit jumlah dan persentase data kosong pada setiap kolom (`01 Tabel jumlah dan persentase missing.jpg`). | Menjamin tidak ada baris teks kosong yang masuk ke dalam proses tokenisasi. |
+| **Distribusi, Skewness & Transformasi** | Analisis *Skewness & Kurtosis* serta penerapan *Log Transformation* (`np.log1p`) pada variabel numerik interaksi. | Menormalkan distribusi fitur pendukung yang miring ekstrem (*right-skewed*). |
+| **Korelasi Non-Parametrik & Outlier** | Uji **Korelasi Spearman** dan deteksi pencilan metode **IQR** pada jumlah kata (`word_count`) dan interaksi (`favorite_count`). | Menjadi dasar empiris penentuan batas panjang urutan (*`max_length`*) pada tokenizer IndoBERT. |
 
 ---
 
 ## Galeri Visualisasi EDA
 
-Seluruh grafik hasil analisis diekspor dalam resolusi tinggi ke dalam folder [`Output/`](Output/).
+Seluruh grafik hasil analisis diekspor dalam resolusi tinggi ke dalam folder [`Output/`](Output/) dan ditautkan langsung di bawah ini:
 
-> [!NOTE]
-> Sesuaikan nama file gambar nomor `01`, `02`, dan `03` di bawah ini dengan nama persis file `.jpg` di dalam folder [`Output/`](Output/) Anda (gunakan `%20` untuk menggantikan spasi).
-
-| Distribusi Kelas Sentimen | WordCloud Opini Kebijakan Fiskal |
+| 1. Audit Missing Values | 2. Analisis Skewness & Kurtosis |
 | :---: | :---: |
-| ![Distribusi Sentimen](Output/01 Tabel jumlah dan persentase missing.jpg) | ![WordCloud Fiskal]([Output/02_wordcloud.jpg](https://github.com/haninurul792/DataScience/commit/12294dd726f77686e81aeabda96e3560efed5e25)) |
+| ![Tabel Jumlah dan Persentase Missing](Output/01%20Tabel%20jumlah%20dan%20persentase%20missing.jpg) | ![Menghitung Skewness dan Kurtosis](Output/02%20Menghitung%20Skewness%20dan%20Kurtosis.jpg) |
 
-| Distribusi Panjang Teks & Token | Deteksi Outlier Panjang Teks (IQR Series) |
+| 3. Penerapan Log Transformation | 4. Distribusi Fitur Numerik & Teks |
 | :---: | :---: |
-| ![Distribusi Panjang Teks](Output/03_panjang_teks.jpg) | ![Deteksi Outlier IQR Series](Output/07%20def%20deteksi%20outlier%20iqr%20series.jpg) |
+| ![Menerapkan Log Transformation](Output/03%20Menerapkan%20Log%20Transformation%20np%20lo.jpg) | ![Visualisasi Subplots 1](Output/04%20fig%20axes%20plt%20subplots%201%202%20figs.jpg) |
+
+| 5. Perbandingan Distribusi Lanjutan | 6. Matriks Korelasi Spearman |
+| :---: | :---: |
+| ![Visualisasi Subplots 2](Output/05%20fig%20axes%20plt%20subplots%201%202%20figs.jpg) | ![Korelasi Spearman](Output/06%20Menggunakan%20Korelasi%20Spearman%20karen.jpg) |
+
+| 7. Deteksi Outlier Panjang Teks & Likes (IQR Series) |
+| :---: |
+| ![Deteksi Outlier IQR Series](Output/07%20def%20deteksi%20outlier%20iqr%20series.jpg) |
 
 ---
 
@@ -85,15 +89,15 @@ Seluruh grafik hasil analisis diekspor dalam resolusi tinggi ke dalam folder [`O
 └────────────────────────────────┬────────────────────────────────┘
                                  ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│  2. TEXT PREPROCESSING & CLEANING                               │
-│     • Case folding, hapus URL, mention, tagar, & tanda baca     │
-│     • Penghapusan duplikasi & normalisasi teks bahasa Indonesia │
+│  2. TEXT PREPROCESSING & DATA QUALITY AUDIT                     │
+│     • Audit missing values, hapus duplikasi, URL, & mention     │
+│     • Case folding & normalisasi teks bahasa Indonesia          │
 └────────────────────────────────┬────────────────────────────────┘
                                  ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│  3. EXPLORATORY DATA ANALYSIS (EDA) LANJUTAN                    │
-│     • Proporsi kelas sentimen (Positif / Netral / Negatif)      │
-│     • Deteksi outlier panjang teks (IQR) & WordCloud            │
+│  3. EXPLORATORY DATA ANALYSIS (EDA) STATISTIK & VISUAL          │
+│     • Skewness, Kurtosis, Log Transformation, & Korelasi Spearman│
+│     • Deteksi outlier IQR (word_count & favorite_count)         │
 └────────────────────────────────┬────────────────────────────────┘
                                  ▼
 ┌─────────────────────────────────────────────────────────────────┐
