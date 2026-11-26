@@ -78,7 +78,18 @@ Seluruh grafik hasil analisis diekspor dalam resolusi tinggi ke dalam folder [`O
 | ![Deteksi Outlier IQR Series](Output/07%20def%20deteksi%20outlier%20iqr%20series.jpg) |
 
 ---
+## Kesimpulan dan Rekomendasi Langkah Selanjutnya
 
+### Kesimpulan Utama
+1. **Integritas & Karakteristik Dataset:** Proses *web scraping* terarah melalui [`Scraping EDA.ipynb`](Scraping%20EDA.ipynb) berhasil menghimpun korpus opini publik media sosial X terkait kebijakan fiskal ke dalam [`DataTwitter_Purbaya_Fiskal.xlsx`](DataTwitter_Purbaya_Fiskal.xlsx). Tahap audit kualitas data dan pembersihan teks memastikan data bebas dari baris kosong (*missing values*), duplikasi, maupun *noise* tautan/karakter tidak relevan sebelum memasuki tahap pemodelan.
+2. **Temuan Eksplorasi Statistik (EDA):** Analisis distribusi menunjukkan adanya kemiringan ekstrem (*right-skewed*) pada variabel interaksi pengguna yang berhasil dinormalisasi menggunakan *Log Transformation* (`np.log1p`), serta deteksi pencilan metode **IQR** pada jumlah kata (`word_count`) yang memberikan dasar empiris dalam menentukan batas panjang token (`max_length`) yang efisien.
+3. **Efektivitas Pendekatan IndoBERT:** Pemanfaatan tokenizer sub-kata *WordPiece* dan mekanisme *bidirectional self-attention* pada arsitektur **IndoBERT** mampu merepresentasikan konteks kalimat media sosial berbahasa Indonesia beserta istilah teknis kebijakan fiskal secara lebih utuh dibandingkan pendekatan berbasis frekuensi kata statis.
+
+### Rekomendasi Langkah Selanjutnya
+1. **Komparasi Multi-Algoritma (Benchmarking):** Melakukan pengujian komparatif secara langsung antara **IndoBERT** (rumpun *Transformer*) dengan arsitektur *Deep Learning* sekuensial (**Bi-LSTM + Attention**) serta algoritma *Ensemble Machine Learning* (**XGBoost** berbasis ekstraksi fitur **TF-IDF**) pada dataset yang sama untuk mengevaluasi keseimbangan (*trade-off*) antara akurasi prediksi dan efisiensi komputasi (*training time* & konsumsi memori GPU).
+2. **Analisis Sentimen Berbasis Aspek (ABSA):** Mengembangkan pemodelan menuju *Aspect-Based Sentiment Analysis* (ABSA) guna memetakan polaritas opini publik secara lebih spesifik pada masing-masing sub-topik kebijakan fiskal (seperti tarif perpajakan, pengelolaan APBN, dan stimulus ekonomi).
+3. **Optimasi Efisiensi Komputasi (PEFT / LoRA):** Menerapkan teknik *Parameter-Efficient Fine-Tuning* seperti **LoRA** (*Low-Rank Adaptation*) agar proses pelatihan ulang (*fine-tuning*) model bahasa berskala besar tetap ringan dan stabil dijalankan pada lingkungan GPU terbatas seperti Google Colab T4.
+4. **Perluasan Sumber Data Lintas Platform:** Mengintegrasikan korpus opini dari portal berita daring dan komentar diskusi video kebijakan ekonomi sebagai data validasi eksternal guna menguji daya generalisasi model.
 ## Alur dan Metodologi
 
 ```text
@@ -112,15 +123,3 @@ Seluruh grafik hasil analisis diekspor dalam resolusi tinggi ke dalam folder [`O
 │     • Evaluasi Accuracy, Precision, Recall, F1 & Confusion Matrix│
 └─────────────────────────────────────────────────────────────────┘
 
-## Kesimpulan dan Rekomendasi Langkah Selanjutnya
-
-### Kesimpulan Utama
-1. **Integritas & Karakteristik Dataset:** Proses *web scraping* terarah melalui [`Scraping EDA.ipynb`](Scraping%20EDA.ipynb) berhasil menghimpun korpus opini publik media sosial X terkait kebijakan fiskal ke dalam [`DataTwitter_Purbaya_Fiskal.xlsx`](DataTwitter_Purbaya_Fiskal.xlsx). Tahap audit kualitas data dan pembersihan teks memastikan data bebas dari baris kosong (*missing values*), duplikasi, maupun *noise* tautan/karakter tidak relevan sebelum memasuki tahap pemodelan.
-2. **Temuan Eksplorasi Statistik (EDA):** Analisis distribusi menunjukkan adanya kemiringan ekstrem (*right-skewed*) pada variabel interaksi pengguna yang berhasil dinormalisasi menggunakan *Log Transformation* (`np.log1p`), serta deteksi pencilan metode **IQR** pada jumlah kata (`word_count`) yang memberikan dasar empiris dalam menentukan batas panjang token (`max_length`) yang efisien.
-3. **Efektivitas Pendekatan IndoBERT:** Pemanfaatan tokenizer sub-kata *WordPiece* dan mekanisme *bidirectional self-attention* pada arsitektur **IndoBERT** mampu merepresentasikan konteks kalimat media sosial berbahasa Indonesia beserta istilah teknis kebijakan fiskal secara lebih utuh dibandingkan pendekatan berbasis frekuensi kata statis.
-
-### Rekomendasi Langkah Selanjutnya
-1. **Komparasi Multi-Algoritma (Benchmarking):** Melakukan pengujian komparatif secara langsung antara **IndoBERT** (rumpun *Transformer*) dengan arsitektur *Deep Learning* sekuensial (**Bi-LSTM + Attention**) serta algoritma *Ensemble Machine Learning* (**XGBoost** berbasis ekstraksi fitur **TF-IDF**) pada dataset yang sama untuk mengevaluasi keseimbangan (*trade-off*) antara akurasi prediksi dan efisiensi komputasi (*training time* & konsumsi memori GPU).
-2. **Analisis Sentimen Berbasis Aspek (ABSA):** Mengembangkan pemodelan menuju *Aspect-Based Sentiment Analysis* (ABSA) guna memetakan polaritas opini publik secara lebih spesifik pada masing-masing sub-topik kebijakan fiskal (seperti tarif perpajakan, pengelolaan APBN, dan stimulus ekonomi).
-3. **Optimasi Efisiensi Komputasi (PEFT / LoRA):** Menerapkan teknik *Parameter-Efficient Fine-Tuning* seperti **LoRA** (*Low-Rank Adaptation*) agar proses pelatihan ulang (*fine-tuning*) model bahasa berskala besar tetap ringan dan stabil dijalankan pada lingkungan GPU terbatas seperti Google Colab T4.
-4. **Perluasan Sumber Data Lintas Platform:** Mengintegrasikan korpus opini dari portal berita daring dan komentar diskusi video kebijakan ekonomi sebagai data validasi eksternal guna menguji daya generalisasi model.
